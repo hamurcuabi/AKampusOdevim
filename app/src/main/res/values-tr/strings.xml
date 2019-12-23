@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AKampusOdevim</string>
+    <string name="action_settings">Ayarlar</string>
+    <string name="image_details_header">Detay:</string>
+    <string name="image_preview_header">Önizleme:</string>
+    <string name="loading_message">Lütfen Bekleyiniz</string>
+
+    <string name="dialog_select_prompt">Resim Seç</string>
+    <string name="dialog_select_camera">Kamera</string>
+    <string name="dialog_select_gallery">Galeri</string>
+
+    <string name="image_picker_error">Bir şeyler ters gitti.Lütfen tekrar deneyiniz:(</string>
+    <string name="use_fab_to_use">Fab butonunu kullanarak resim seçimi yapınız</string>
+    <string name="win_message">Toplam %d puan kazandınız!</string>
+    <string name="loose_message">Malesef puan kazanamadınız:(</string>
+    <string name="crop_error">Cihazının kırpmayı desteklemiyor</string>
+</resources>
