@@ -12,6 +12,6 @@
     <string name="image_picker_error">Bir şeyler ters gitti.Lütfen tekrar deneyiniz:(</string>
     <string name="use_fab_to_use">Fab butonunu kullanarak resim seçimi yapınız</string>
     <string name="win_message">Toplam %d puan kazandınız!</string>
-    <string name="loose_message">Malesef puan kazanamadınız:(</string>
+    <string name="loose_message">P-G Ürünleri Bulunamadı</string>
     <string name="crop_error">Cihazının kırpmayı desteklemiyor</string>
 </resources>
