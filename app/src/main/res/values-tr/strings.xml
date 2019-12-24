@@ -14,4 +14,5 @@
     <string name="win_message">Toplam %d puan kazandınız!</string>
     <string name="loose_message">P-G Ürünleri Bulunamadı</string>
     <string name="crop_error">Cihazının kırpmayı desteklemiyor</string>
+    <string name="api_activty_name">Api Ekranı</string>
 </resources>

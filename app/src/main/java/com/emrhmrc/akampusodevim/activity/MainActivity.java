@@ -20,27 +20,35 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
+import androidx.appcompat.widget.Toolbar;
 
 import com.emrhmrc.akampusodevim.R;
+import com.emrhmrc.akampusodevim.base.BaseActivity;
 import com.emrhmrc.akampusodevim.helper.ImageHelper;
 import com.emrhmrc.akampusodevim.helper.StringHelper;
 import com.emrhmrc.akampusodevim.util.PackageManagerUtils;
 import com.emrhmrc.akampusodevim.util.PermissionUtils;
 import com.emrhmrc.sweetdialoglib.DialogCreater;
 import com.emrhmrc.sweetdialoglib.SweetAlertDialog;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -59,12 +67,9 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -74,35 +79,14 @@ import butterknife.OnClick;
 import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_CERT_HEADER;
 import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_PACKAGE_HEADER;
 import static com.emrhmrc.akampusodevim.helper.Constants.CLOUD_VISION_API_KEY;
-import static com.emrhmrc.akampusodevim.helper.Constants.FILE_NAME;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int MAX_DIMENSION = 1200;
-
-    private static final int GALLERY_PERMISSIONS_REQUEST = 0;
-    private static final int GALLERY_IMAGE_REQUEST = 1;
-    private static final int CAMERA_PERMISSIONS_REQUEST = 2;
-    private static final int CAMERA_IMAGE_REQUEST = 3;
-    private static final int RESULT_CROP = 4;
-
-    @BindView(R.id.image_details)
-    TextView image_details;
-    @BindView(R.id.main_image)
-    ImageView main_image;
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
-    private SweetAlertDialog loadinDialog;
-    private List<String> expectedStrings;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        initialize();
+    protected void onLoad() {
+        setTitle("ClientSide");
         loadExpectedStrings();
     }
 
@@ -112,47 +96,6 @@ public class MainActivity extends AppCompatActivity {
         expectedStrings.add("erişim");
         expectedStrings.add("ile");
         expectedStrings.add("ver");
-    }
-
-    private void initialize() {
-
-        expectedStrings = new ArrayList<>();
-    }
-
-    private void openPickImageDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setMessage(R.string.dialog_select_prompt)
-                .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
-                .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
-        builder.create().show();
-    }
-
-    public void startGalleryChooser() {
-        if (PermissionUtils.requestPermission(this, GALLERY_PERMISSIONS_REQUEST, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,
-                    getResources().getString(R.string.dialog_select_prompt)),
-                    GALLERY_IMAGE_REQUEST);
-        }
-    }
-
-    public void startCamera() {
-        if (PermissionUtils.requestPermission(
-                this,
-                CAMERA_PERMISSIONS_REQUEST,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
-        }
-    }
-
-    @OnClick({R.id.fab})
-    public void pickImage() {
-        openPickImageDialog();
     }
 
     @Override
@@ -189,196 +132,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void uploadImage(Uri uri) {
-        if (uri != null) {
-            try {
-                // scale the image to save on bandwidth
-                Bitmap bitmap = ImageHelper.scaleBitmapDown(
-                        MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
-                        MAX_DIMENSION);
-                callCloudVision(bitmap);
-                main_image.setImageBitmap(bitmap);
-
-            } catch (IOException e) {
-                Log.e(TAG, "Image picking failed because " + e.getMessage());
-                DialogCreater.errorDialog(this, getResources().getString(R.string.image_picker_error));
-            }
-        } else {
-            Log.i(TAG, "Image picker gave us a null image.");
-            DialogCreater.errorDialog(this, getResources().getString(R.string.image_picker_error));
+    @Override
+    public void detectText() {
+        TextRecognizer recognizer = new TextRecognizer.Builder(MainActivity.this).build();
+        Bitmap bitmap = ((BitmapDrawable) main_image.getDrawable()).getBitmap();
+        Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+        SparseArray<TextBlock> sparseArray = recognizer.detect(frame);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < sparseArray.size(); i++) {
+            TextBlock tx = sparseArray.get(i);
+            String str = tx.getValue();
+            stringBuilder.append(str);
         }
+        image_details.setText(stringBuilder);
+        lookExpectedWords();
     }
 
-    private Vision.Images.Annotate prepareAnnotationRequest(Bitmap bitmap) throws IOException {
-        HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
-        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-        VisionRequestInitializer requestInitializer =
-                new VisionRequestInitializer(CLOUD_VISION_API_KEY) {
-                    @Override
-                    protected void initializeVisionRequest(VisionRequest<?> visionRequest)
-                            throws IOException {
-                        super.initializeVisionRequest(visionRequest);
-                        String packageName = getPackageName();
-                        visionRequest.getRequestHeaders().set(ANDROID_PACKAGE_HEADER, packageName);
-                        String sig = PackageManagerUtils.getSignature(getPackageManager(), packageName);
-                        visionRequest.getRequestHeaders().set(ANDROID_CERT_HEADER, sig);
-                    }
-                };
-
-        Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
-        builder.setVisionRequestInitializer(requestInitializer);
-
-        Vision vision = builder.build();
-
-        BatchAnnotateImagesRequest batchAnnotateImagesRequest =
-                new BatchAnnotateImagesRequest();
-        batchAnnotateImagesRequest.setRequests(new ArrayList<AnnotateImageRequest>() {{
-            AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
-
-            Image base64EncodedImage = new Image();
-            // Convert the bitmap to a JPEG
-            // Just in case it's a format that Android understands but Cloud Vision
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
-            // Base64 encode the JPEG
-            base64EncodedImage.encodeContent(imageBytes);
-            annotateImageRequest.setImage(base64EncodedImage);
-
-
-            // add the features we want
-            annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                Feature textdetect = new Feature();
-                textdetect.setType("TEXT_DETECTION");
-                add(textdetect);
-            }});
-
-            // Add the list of one thing to the request
-            add(annotateImageRequest);
-        }});
-
-        Vision.Images.Annotate annotateRequest =
-                vision.images().annotate(batchAnnotateImagesRequest);
-        annotateRequest.setDisableGZipContent(true);
-        Log.e(TAG, "created Cloud Vision request object, sending request");
-        return annotateRequest;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
     }
 
-    private void callCloudVision(final Bitmap bitmap) {
-
-        try {
-            AsyncTask<Object, Void, String> textDetectionTask =
-                    new TextDetectionTask(MainActivity.this,
-                            prepareAnnotationRequest(bitmap));
-            textDetectionTask.execute();
-        } catch (IOException e) {
-            DialogCreater.errorDialog(this, "Failed: " + e.getLocalizedMessage());
-            Log.d(TAG, "failed to make API request because of other IOException " +
-                    e.getMessage());
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_api_activty:
+                goApiActivty();
+                break;
         }
+        return super.onOptionsItemSelected(item);
     }
 
-    private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "";
-        List<EntityAnnotation> annotations;
-        AnnotateImageResponse annotateImageResponse = response.getResponses().get(0);
-        annotations = annotateImageResponse.getTextAnnotations();
-        if (annotations != null) {
-            for (EntityAnnotation annotation : annotations) {
-                message += annotation.getDescription() + " ";
-
-            }
-        } else {
-            message += "nothing";
-        }
-
-        return message;
-    }
-
-    private void lookExpectedWords(String foundedString) {
-
-        int point = 0;
-        for (String item : expectedStrings
-        ) {
-            if (foundedString.contains(item.toLowerCase())) {
-                point += 10;
-                StringHelper.setHighLightedText(image_details, item);
-            }
-
-        }
-        if (point > 0) {
-            DialogCreater.succesDialog(this, getResources().getString(R.string.win_message, point));
-        } else {
-            DialogCreater.warningDialog(this, getResources().getString(R.string.loose_message));
-        }
+    private void goApiActivty() {
+        Intent intent = new Intent(this, VisionApiActivity.class);
+        startActivity(intent);
 
     }
-
-    private void performCrop(Uri picUri) {
-        try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-
-            cropIntent.setDataAndType(picUri, "image/*");
-            // set crop properties
-            cropIntent.putExtra("crop", "true");
-
-          /*  cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-
-            cropIntent.putExtra("outputX", 280);
-            cropIntent.putExtra("outputY", 280);*/
-            // retrieve data on return
-            cropIntent.putExtra("data", true);
-            startActivityForResult(cropIntent, RESULT_CROP);
-        } catch (ActivityNotFoundException ex) {
-            DialogCreater.errorDialog(this, getResources().getString(R.string.crop_error));
-        }
-    }
-
-    private class TextDetectionTask extends AsyncTask<Object, Void, String> {
-        private final WeakReference<MainActivity> mActivityWeakReference;
-        private Vision.Images.Annotate mRequest;
-
-        TextDetectionTask(MainActivity activity, Vision.Images.Annotate annotate) {
-            mActivityWeakReference = new WeakReference<>(activity);
-            mRequest = annotate;
-            loadinDialog = DialogCreater.loadingDialog(activity);
-        }
-
-        @Override
-        protected String doInBackground(Object... params) {
-            try {
-                Log.d(TAG, "created Cloud Vision request object, sending request");
-                BatchAnnotateImagesResponse response = mRequest.execute();
-                return convertResponseToString(response);
-
-            } catch (GoogleJsonResponseException e) {
-                Log.d(TAG, "failed to make API request because " + e.getContent());
-
-            } catch (IOException e) {
-                Log.d(TAG, "failed to make API request because of other IOException " +
-                        e.getMessage());
-
-            }
-            return "error";
-        }
-
-        protected void onPostExecute(String result) {
-            MainActivity activity = mActivityWeakReference.get();
-            if (activity != null && !activity.isFinishing()) {
-                if (!result.equals("error")) {
-                    result = result.replace("\n", "").replace("\r", "").toLowerCase();
-                    image_details.setText(result);
-                    lookExpectedWords(result);
-                } else {
-                    DialogCreater.errorDialog(activity, "VisionApi Error!");
-                }
-                loadinDialog.dismissWithAnimation();
-
-            }
-        }
-
-    }
-
 }
+
+

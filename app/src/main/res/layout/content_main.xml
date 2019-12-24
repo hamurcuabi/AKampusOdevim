@@ -4,46 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:showIn="@layout/activity_main">
+    android:layout_marginTop="?actionBarSize"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_margin="@dimen/middle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="@dimen/middle"
         android:layout_weight="1">
 
-        <ImageView
-            android:layout_margin="@dimen/middle"
-            android:id="@+id/main_image"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter" />
+            android:layout_height="match_parent"
+            app:cardCornerRadius="@dimen/small">
+
+            <ImageView
+                android:id="@+id/main_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/middle"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_launcher" />
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="@dimen/middle"
         android:layout_weight="2">
 
-
-        <ScrollView
-            android:layout_margin="@dimen/middle"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:cardCornerRadius="@dimen/small">
 
-            <TextView
-                android:textIsSelectable="true"
-                android:layout_margin="@dimen/middle"
-                android:id="@+id/image_details"
+            <ScrollView
+
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/middle"
-                android:text="@string/use_fab_to_use"
-                android:textAlignment="center" />
+                android:layout_margin="@dimen/middle">
 
-        </ScrollView>
+                <TextView
+                    android:id="@+id/image_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/middle"
+                    android:layout_marginBottom="@dimen/large"
+                    android:padding="@dimen/middle"
+                    android:text="@string/use_fab_to_use"
+                    android:textAlignment="center"
+                    android:textIsSelectable="true" />
+
+            </ScrollView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
 </LinearLayout>

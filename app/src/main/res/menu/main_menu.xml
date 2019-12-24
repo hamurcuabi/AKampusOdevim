@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@android:drawable/btn_star_big_on"
+        android:id="@+id/item_api_activty"
+        app:showAsAction="always"
+        android:title="@string/api_activty_name" />
+</menu>

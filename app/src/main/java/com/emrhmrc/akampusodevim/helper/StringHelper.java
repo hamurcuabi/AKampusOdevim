@@ -1,5 +1,6 @@
 package com.emrhmrc.akampusodevim.helper;
 
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -17,7 +18,8 @@ public class StringHelper {
                 break;
             else {
                 // set color here
-                wordToSpan.setSpan(new BackgroundColorSpan(0xFFFFFF00), ofe, ofe + textToHighlight.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                wordToSpan.setSpan(new BackgroundColorSpan(Color.GREEN), ofe,
+                        ofe + textToHighlight.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tv.setText(wordToSpan, TextView.BufferType.SPANNABLE);
             }
         }

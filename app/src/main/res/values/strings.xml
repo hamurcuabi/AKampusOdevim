@@ -12,4 +12,5 @@
     <string name="win_message">Total %d Points you have won!</string>
     <string name="loose_message">P-G products not fount</string>
     <string name="crop_error">your device doesn\'t support the crop action!</string>
+    <string name="api_activty_name">Api Screen</string>
 </resources>
