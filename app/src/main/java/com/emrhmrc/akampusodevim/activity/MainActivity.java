@@ -49,9 +49,9 @@ public class MainActivity extends BaseActivity {
     private void loadExpectedStrings() {
         if (expectedStrings == null)
             expectedStrings = new ArrayList<>();
-        expectedStrings.add("erişim");
-        expectedStrings.add("ile");
-        expectedStrings.add("ver");
+        expectedStrings.add("Pantene");
+        expectedStrings.add("Orkid");
+        expectedStrings.add("Gillette");
     }
 
     @Override
