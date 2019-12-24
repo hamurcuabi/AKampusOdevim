@@ -1,36 +1,19 @@
 package com.emrhmrc.akampusodevim.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.util.SparseArray;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.emrhmrc.akampusodevim.R;
+import androidx.annotation.NonNull;
+
 import com.emrhmrc.akampusodevim.base.BaseActivity;
-import com.emrhmrc.akampusodevim.helper.ImageHelper;
-import com.emrhmrc.akampusodevim.helper.StringHelper;
 import com.emrhmrc.akampusodevim.util.PackageManagerUtils;
 import com.emrhmrc.akampusodevim.util.PermissionUtils;
 import com.emrhmrc.sweetdialoglib.DialogCreater;
 import com.emrhmrc.sweetdialoglib.SweetAlertDialog;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -52,10 +35,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_CERT_HEADER;
 import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_PACKAGE_HEADER;

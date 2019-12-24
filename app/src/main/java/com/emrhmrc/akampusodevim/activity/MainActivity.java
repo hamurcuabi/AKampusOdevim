@@ -16,69 +16,25 @@
 
 package com.emrhmrc.akampusodevim.activity;
 
-import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.emrhmrc.akampusodevim.R;
 import com.emrhmrc.akampusodevim.base.BaseActivity;
-import com.emrhmrc.akampusodevim.helper.ImageHelper;
-import com.emrhmrc.akampusodevim.helper.StringHelper;
-import com.emrhmrc.akampusodevim.util.PackageManagerUtils;
 import com.emrhmrc.akampusodevim.util.PermissionUtils;
-import com.emrhmrc.sweetdialoglib.DialogCreater;
-import com.emrhmrc.sweetdialoglib.SweetAlertDialog;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.vision.v1.Vision;
-import com.google.api.services.vision.v1.VisionRequest;
-import com.google.api.services.vision.v1.VisionRequestInitializer;
-import com.google.api.services.vision.v1.model.AnnotateImageRequest;
-import com.google.api.services.vision.v1.model.AnnotateImageResponse;
-import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
-import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
-import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.google.api.services.vision.v1.model.Feature;
-import com.google.api.services.vision.v1.model.Image;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_CERT_HEADER;
-import static com.emrhmrc.akampusodevim.helper.Constants.ANDROID_PACKAGE_HEADER;
-import static com.emrhmrc.akampusodevim.helper.Constants.CLOUD_VISION_API_KEY;
 
 
 public class MainActivity extends BaseActivity {
