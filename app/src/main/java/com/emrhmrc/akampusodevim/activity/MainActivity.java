@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity {
             stringBuilder.append(str);
         }
         image_details.setText(stringBuilder);
-        lookExpectedWords();
+       // lookExpectedWords();
     }
 
     @Override
